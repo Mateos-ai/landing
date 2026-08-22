@@ -55,22 +55,102 @@ const howSteps = [
     num: "01",
     title: "Start at the sharpest pain",
     body: "Whatever hurts most, sales, service or HR, that is where we begin. It is what you actually came for.",
+    color: "amber",
   },
   {
     num: "02",
     title: "Solve today, build for tomorrow",
     body: "We fix the immediate need in a way that quietly lays the groundwork for the broader, connected solution.",
+    color: "teal",
   },
   {
     num: "03",
     title: "Own it end to end",
     body: "Business strategy and execution, both. We do not hand off a slide deck. We build it and we run it with you.",
+    color: "indigo",
   },
   {
     num: "04",
     title: "Every project compounds",
     body: "A solution built once becomes a tool your organization keeps. That is exactly how our Sales Magician was born.",
+    color: "gradient",
   },
+];
+
+// Silos: four departments, each with its own AI, none of them connected. The
+// flows stop well short of the empty core so "nothing in the middle" reads at a
+// glance, which is the setup the Company Brain constellation below pays off.
+const SILO_CORE = { x: 450, y: 170, r: 56 };
+const SILO_CORE_M = { x: 200, y: 258, r: 46 };
+
+const silos = [
+  { label: "Sales",     src: "/salesforce.webp", x: 140, y: 90,  mx: 96,  my: 66  },
+  { label: "Support",   src: "/zendesk.webp",    x: 140, y: 250, mx: 304, my: 66  },
+  { label: "Marketing", src: "/hubspot.webp",    x: 760, y: 90,  mx: 96,  my: 452 },
+  { label: "R&D",       src: "/notion.webp",     x: 760, y: 250, mx: 304, my: 452 },
+];
+
+// Where a silo's outbound flow starts (just clear of its box) and dies (a little
+// over half the remaining distance to the core, leaving a visible void).
+function siloFlow(sx, sy, core, clear) {
+  const dx = core.x - sx;
+  const dy = core.y - sy;
+  const len = Math.hypot(dx, dy);
+  const ux = dx / len;
+  const uy = dy / len;
+  const stop = clear + (len - core.r - clear) * 0.58;
+  return {
+    x1: +(sx + ux * clear).toFixed(1),
+    y1: +(sy + uy * clear).toFixed(1),
+    x2: +(sx + ux * stop).toFixed(1),
+    y2: +(sy + uy * stop).toFixed(1),
+    tx: +(ux * (stop - clear)).toFixed(1),
+    ty: +(uy * (stop - clear)).toFixed(1),
+  };
+}
+
+// Constellation: input systems feed one Company Brain that powers trusted
+// agents. Two coordinate sets so the graphic stays legible either way:
+// `x/y` in a landscape viewBox "0 0 900 520" (systems left, agents right) and
+// `mx/my` in a portrait viewBox "0 0 400 660" (systems top, agents bottom).
+const CORE = { x: 460, y: 260 };
+const R_CORE = 62;
+const TILE = 60;
+
+const CORE_M = { x: 200, y: 320 };
+const R_CORE_M = 52;
+const TILE_M = 54;
+
+const brainSources = [
+  { name: "Gmail",           src: "/gmail.webp",      x: 90,  y: 70,  mx: 62,  my: 42 },
+  { name: "Slack",           src: "/slack.webp",      x: 250, y: 95,  mx: 154, my: 42 },
+  { name: "Zendesk",         src: "/zendesk.webp",    x: 70,  y: 200, mx: 246, my: 42 },
+  { name: "Datadog",         src: "/datadog.webp",    x: 235, y: 210, mx: 338, my: 42 },
+  { name: "HubSpot",         src: "/hubspot.webp",    x: 95,  y: 320, mx: 62,  my: 118 },
+  { name: "Notion",          src: "/notion.webp",     x: 255, y: 330, mx: 154, my: 118 },
+  { name: "Salesforce",      src: "/salesforce.webp", x: 100, y: 440, mx: 246, my: 118 },
+  { name: "Google Calendar", src: "/gcalendar.webp",  x: 255, y: 445, mx: 338, my: 118 },
+];
+
+const brainAgents = [
+  { label: "Support agent", score: "98%", x: 745, y: 130, mx: 200, my: 470 },
+  { label: "Revenue agent", score: "96%", x: 785, y: 260, mx: 200, my: 540 },
+  { label: "Ops agent",     score: "99%", x: 745, y: 390, mx: 200, my: 610 },
+];
+
+const integrations = [
+  { name: "WhatsApp", src: "/whatsapp.svg" },
+  { name: "Slack", src: "/slack.webp" },
+  { name: "HubSpot", src: "/hubspot.webp" },
+  { name: "Notion", src: "/notion.webp" },
+  { name: "Zendesk", src: "/zendesk.webp" },
+  { name: "Salesforce", src: "/salesforce.webp" },
+  { name: "Monday", src: "/monday.webp" },
+  { name: "ClickUp", src: "/clickup.webp" },
+  { name: "Todoist", src: "/todoist.webp" },
+  { name: "Gmail", src: "/gmail.webp" },
+  { name: "Google Calendar", src: "/gcalendar.webp" },
+  { name: "Outlook", src: "/outlook.webp" },
 ];
 
 const teamLogos = [
@@ -149,7 +229,7 @@ const teamLogos = [
         <p class="hero-tagline">From diagnosis to execution, end to end.</p>
         <p class="hero-sub">AI is arriving in your organization in silos. We connect it into one intelligence layer, built on the tools you already use, and take you from stage one of AI to stage ten.</p>
         <div class="hero-actions">
-          <a href="#thesis" class="btn-ghost-lg btn-ghost-animated">See The Magic ↓</a>
+          <a href="#thesis" class="btn-ghost-lg btn-ghost-animated">See How It Works ↓</a>
         </div>
       </div>
     </section>
@@ -159,7 +239,214 @@ const teamLogos = [
       <div class="wrap thesis-inner" data-reveal>
         <h2>Your People Use AI in <span class="gradient-text">Silos</span></h2>
         <p class="thesis-lead">ChatGPT in one corner. AI inside the CRM in another. Something else in sales, something else in R&amp;D. None of it talks to each other, so the value stays trapped.</p>
+      </div>
+
+      <div class="wrap">
+        <div class="silo-viz" data-reveal>
+          <svg class="silo-wide" viewBox="0 0 900 340" role="img" aria-label="Four departments, each running its own AI, with nothing connecting them in the middle.">
+            {silos.map((s, i) => {
+              const f = siloFlow(s.x, s.y, SILO_CORE, 88);
+              return (
+                <>
+                  <line class="silo-line" x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2} />
+                  {[0, 1].map((d) => (
+                    <circle
+                      class="silo-dot"
+                      cx={f.x1}
+                      cy={f.y1}
+                      r="4.4"
+                      style={`--dx:${f.tx}px; --dy:${f.ty}px; animation-delay:${(i * 0.35 + d * 1.3).toFixed(2)}s`}
+                    />
+                  ))}
+                </>
+              );
+            })}
+
+            <circle class="silo-core" cx={SILO_CORE.x} cy={SILO_CORE.y} r={SILO_CORE.r} />
+            <text class="silo-core-label" x={SILO_CORE.x} y={SILO_CORE.y + SILO_CORE.r + 26} text-anchor="middle">No shared layer</text>
+
+            {silos.map((s) => (
+              <g>
+                <rect class="silo-box" x={s.x - 75} y={s.y - 60} width="150" height="120" rx="16" />
+                <rect class="silo-tile" x={s.x - 21} y={s.y - 46} width="42" height="42" rx="11" />
+                <image href={s.src} x={s.x - 14} y={s.y - 39} width="28" height="28" preserveAspectRatio="xMidYMid meet" />
+                <text class="silo-label" x={s.x} y={s.y + 20} text-anchor="middle">{s.label}</text>
+                <rect class="silo-chip" x={s.x - 31} y={s.y + 30} width="62" height="20" rx="10" />
+                <text class="silo-chip-text" x={s.x} y={s.y + 44} text-anchor="middle">OWN AI</text>
+              </g>
+            ))}
+          </svg>
+
+          <svg class="silo-tall" viewBox="0 0 400 520" role="img" aria-label="Four departments, each running its own AI, with nothing connecting them in the middle.">
+            {silos.map((s, i) => {
+              const f = siloFlow(s.mx, s.my, SILO_CORE_M, 76);
+              return (
+                <>
+                  <line class="silo-line" x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2} />
+                  {[0, 1].map((d) => (
+                    <circle
+                      class="silo-dot"
+                      cx={f.x1}
+                      cy={f.y1}
+                      r="4.2"
+                      style={`--dx:${f.tx}px; --dy:${f.ty}px; animation-delay:${(i * 0.35 + d * 1.3).toFixed(2)}s`}
+                    />
+                  ))}
+                </>
+              );
+            })}
+
+            <circle class="silo-core" cx={SILO_CORE_M.x} cy={SILO_CORE_M.y} r={SILO_CORE_M.r} />
+            <text class="silo-core-label silo-core-label-sm" x={SILO_CORE_M.x} y={SILO_CORE_M.y + SILO_CORE_M.r + 24} text-anchor="middle">No shared layer</text>
+
+            {silos.map((s) => (
+              <g>
+                <rect class="silo-box" x={s.mx - 84} y={s.my - 59} width="168" height="118" rx="16" />
+                <rect class="silo-tile" x={s.mx - 21} y={s.my - 45} width="42" height="42" rx="11" />
+                <image href={s.src} x={s.mx - 14} y={s.my - 38} width="28" height="28" preserveAspectRatio="xMidYMid meet" />
+                <text class="silo-label" x={s.mx} y={s.my + 21} text-anchor="middle">{s.label}</text>
+                <rect class="silo-chip" x={s.mx - 31} y={s.my + 31} width="62" height="20" rx="10" />
+                <text class="silo-chip-text" x={s.mx} y={s.my + 45} text-anchor="middle">OWN AI</text>
+              </g>
+            ))}
+          </svg>
+        </div>
+      </div>
+
+      <div class="wrap thesis-inner thesis-outro" data-reveal>
         <p class="thesis-lead">We do the harder, more valuable thing: <strong class="gradient-text">we connect it.</strong> We build the intelligence layer that lets your whole organization learn, and we take you from stage one of AI to stage ten.</p>
+      </div>
+    </section>
+
+    <!-- ── COMPANY BRAIN ──────────────────────────────────────────────── -->
+    <section class="brain-section" id="brain">
+      <div class="wrap">
+        <div class="section-header" data-reveal>
+          <h2>Not just point solutions.<br /><span class="gradient-text">One Company Brain.</span></h2>
+          <p class="section-sub">Automation and AI tools each solve one thing and stop there. We connect your systems into a single brain, then put agents on top of it, so what one team learns, the whole company knows.</p>
+        </div>
+
+        <div class="constellation" data-reveal>
+          <svg class="cst-wide" viewBox="0 0 900 520" role="img" aria-label="Your systems connect into one Company Brain that powers trusted agents, each with evals.">
+            <defs>
+              <filter id="cstShadow" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#14141e" flood-opacity="0.14" />
+              </filter>
+            </defs>
+
+            <!-- connectors: systems -> brain -->
+            {brainSources.map((s, i) => (
+              <>
+                <line class="cst-line-base" x1={s.x} y1={s.y} x2={CORE.x} y2={CORE.y} />
+                <line class="cst-line-flow" x1={s.x} y1={s.y} x2={CORE.x} y2={CORE.y} style={`animation-delay:${(i * 0.13).toFixed(2)}s`} />
+              </>
+            ))}
+
+            <!-- connectors: brain -> agents -->
+            {brainAgents.map((a, i) => (
+              <>
+                <line class="cst-line-base" x1={CORE.x} y1={CORE.y} x2={a.x} y2={a.y} />
+                <line class="cst-line-flow out" x1={CORE.x} y1={CORE.y} x2={a.x} y2={a.y} style={`animation-delay:${(i * 0.2).toFixed(2)}s`} />
+              </>
+            ))}
+
+            <!-- brain glow -->
+            <circle class="cst-core-glow" cx={CORE.x} cy={CORE.y} r={R_CORE} />
+
+            <!-- system tiles -->
+            {brainSources.map((s) => (
+              <g filter="url(#cstShadow)">
+                <rect class="cst-tile" x={s.x - TILE / 2} y={s.y - TILE / 2} width={TILE} height={TILE} rx="14" />
+                <image href={s.src} x={s.x - TILE / 2 + 11} y={s.y - TILE / 2 + 11} width={TILE - 22} height={TILE - 22} preserveAspectRatio="xMidYMid meet" />
+              </g>
+            ))}
+
+            <!-- brain -->
+            <g filter="url(#cstShadow)">
+              <circle class="cst-core" cx={CORE.x} cy={CORE.y} r={R_CORE} />
+              <g transform="translate(421,221) scale(0.39)">
+                <circle cx="130" cy="70" r="27" fill="#FF8C42" />
+                <circle cx="70" cy="130" r="27" fill="#17BEBB" />
+                <circle cx="130" cy="130" r="27" fill="#5B53E8" />
+              </g>
+            </g>
+            <text class="cst-core-label" x={CORE.x} y={CORE.y + R_CORE + 24} text-anchor="middle">Company Brain</text>
+
+            <!-- agents with evals -->
+            {brainAgents.map((a) => {
+              const w = 176;
+              const h = 58;
+              const lx = a.x - w / 2;
+              const ly = a.y - h / 2;
+              return (
+                <g filter="url(#cstShadow)">
+                  <rect class="cst-agent" x={lx} y={ly} width={w} height={h} rx="14" />
+                  <circle class="cst-agent-live" cx={lx + 18} cy={a.y} r="4" />
+                  <text class="cst-agent-label" x={lx + 32} y={a.y - 3}>{a.label}</text>
+                  <text class="cst-agent-eval" x={lx + 32} y={a.y + 17}>evals() ✓ {a.score}</text>
+                </g>
+              );
+            })}
+          </svg>
+
+          <svg class="cst-tall" viewBox="0 0 400 660" role="img" aria-label="Your systems connect into one Company Brain that powers trusted agents, each with evals.">
+            <defs>
+              <filter id="cstShadowM" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#14141e" flood-opacity="0.14" />
+              </filter>
+            </defs>
+
+            <!-- connectors: systems -> brain -->
+            {brainSources.map((s, i) => (
+              <>
+                <line class="cst-line-base" x1={s.mx} y1={s.my} x2={CORE_M.x} y2={CORE_M.y} />
+                <line class="cst-line-flow" x1={s.mx} y1={s.my} x2={CORE_M.x} y2={CORE_M.y} style={`animation-delay:${(i * 0.13).toFixed(2)}s`} />
+              </>
+            ))}
+
+            <!-- connectors: brain -> agents -->
+            {brainAgents.map((a, i) => (
+              <>
+                <line class="cst-line-base" x1={CORE_M.x} y1={CORE_M.y} x2={a.mx} y2={a.my} />
+                <line class="cst-line-flow out" x1={CORE_M.x} y1={CORE_M.y} x2={a.mx} y2={a.my} style={`animation-delay:${(i * 0.2).toFixed(2)}s`} />
+              </>
+            ))}
+
+            <circle class="cst-core-glow" cx={CORE_M.x} cy={CORE_M.y} r={R_CORE_M} />
+
+            {brainSources.map((s) => (
+              <g filter="url(#cstShadowM)">
+                <rect class="cst-tile" x={s.mx - TILE_M / 2} y={s.my - TILE_M / 2} width={TILE_M} height={TILE_M} rx="13" />
+                <image href={s.src} x={s.mx - TILE_M / 2 + 10} y={s.my - TILE_M / 2 + 10} width={TILE_M - 20} height={TILE_M - 20} preserveAspectRatio="xMidYMid meet" />
+              </g>
+            ))}
+
+            <g filter="url(#cstShadowM)">
+              <circle class="cst-core" cx={CORE_M.x} cy={CORE_M.y} r={R_CORE_M} />
+              <g transform="translate(167,287) scale(0.33)">
+                <circle cx="130" cy="70" r="27" fill="#FF8C42" />
+                <circle cx="70" cy="130" r="27" fill="#17BEBB" />
+                <circle cx="130" cy="130" r="27" fill="#5B53E8" />
+              </g>
+            </g>
+            <text class="cst-core-label cst-core-label-sm" x={CORE_M.x} y={CORE_M.y + R_CORE_M + 22} text-anchor="middle">Company Brain</text>
+
+            {brainAgents.map((a) => {
+              const w = 260;
+              const h = 54;
+              const lx = a.mx - w / 2;
+              const ly = a.my - h / 2;
+              return (
+                <g filter="url(#cstShadowM)">
+                  <rect class="cst-agent" x={lx} y={ly} width={w} height={h} rx="13" />
+                  <circle class="cst-agent-live" cx={lx + 18} cy={a.my} r="4" />
+                  <text class="cst-agent-label" x={lx + 32} y={a.my - 3}>{a.label}</text>
+                  <text class="cst-agent-eval" x={lx + 32} y={a.my + 16}>evals() ✓ {a.score}</text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
       </div>
     </section>
 
@@ -167,7 +454,7 @@ const teamLogos = [
     <section class="services-section" id="services">
       <div class="wrap">
         <div class="section-header" data-reveal>
-          <h2><span class="gradient-text">One partner</span>, end to end</h2>
+          <h2><span class="gradient-text">End to End</span></h2>
           <p class="section-sub">Start where it hurts most and grow at your own pace. Everything runs on the tools you already use.</p>
         </div>
         <div class="services-grid">
@@ -188,14 +475,49 @@ const teamLogos = [
         <div class="section-header" data-reveal>
           <h2>Start small. <span class="gradient-text">Compound</span> fast.</h2>
         </div>
-        <div class="how-grid">
+      </div>
+
+      <div class="how-chain-wrap">
+        <div class="how-chain">
           {howSteps.map((step, i) => (
-            <article class="how-card" data-reveal data-reveal-delay={String((i % 2) + 1)}>
-              <div class="how-num">{step.num}</div>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
-            </article>
+            /* display:contents on wide screens, so the chevron lands in the grid's
+               first row and its note in the second while staying paired here. */
+            <div class={`how-step how-s${i + 1}`}>
+              <div class="how-chev" data-reveal data-reveal-delay={String(i + 1)}>
+                <div class="how-num">{step.num}</div>
+                <h3>{step.title}</h3>
+              </div>
+              <div class="how-note" data-reveal data-reveal-delay={String(i + 1)}>
+                <p>{step.body}</p>
+                {/* One block per step so far: what you keep grows as the steps chain. */}
+                <div class="how-stack" aria-hidden="true">
+                  {Array.from({ length: i + 1 }, () => <span />)}
+                </div>
+              </div>
+            </div>
           ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INTEGRATIONS ───────────────────────────────────────────────── -->
+    <section class="integrations-section" id="integrations">
+      <div class="wrap">
+        <div class="section-header" data-reveal>
+          <h2>Runs on the tools <span class="gradient-text">you already use</span></h2>
+          <p class="section-sub">No rip and replace. We build on the systems your organization already runs on.</p>
+        </div>
+        <div class="carousel-track">
+          <div class="carousel-inner">
+            {[...integrations, ...integrations].map((i, idx) => (
+              <img
+                src={i.src}
+                alt={idx < integrations.length ? i.name : ""}
+                class="carousel-logo"
+                aria-hidden={idx < integrations.length ? undefined : "true"}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -499,6 +821,10 @@ const teamLogos = [
     padding: 110px 0;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
+    /* Section background, so labels can knock out the lines behind them. */
+    --cst-bg: var(--surface);
+    /* Silo boxes sit one step off the section background, which inverts by theme. */
+    --silo-fill: var(--surface-subtle);
   }
   .thesis-inner {
     max-width: 780px;
@@ -517,6 +843,181 @@ const teamLogos = [
     color: var(--text-secondary);
   }
   .thesis-lead + .thesis-lead { margin-top: 20px; }
+
+  /* ── Silos ───────────────────────────────────────────────────────────── */
+  .silo-viz { max-width: 920px; margin: 44px auto 40px; }
+  .silo-viz svg { width: 100%; height: auto; overflow: visible; }
+  .silo-tall { display: none; }
+  @media (max-width: 700px) {
+    .silo-wide { display: none; }
+    .silo-tall { display: block; max-width: 420px; margin: 0 auto; }
+  }
+  .thesis-outro { margin-top: 0; }
+
+  .silo-box { fill: var(--silo-fill); stroke: var(--border); stroke-width: 1.2; }
+  .silo-tile { fill: #ffffff; stroke: rgba(20,20,30,0.08); stroke-width: 1; }
+  .silo-label {
+    fill: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .silo-chip { fill: var(--cst-bg); stroke: var(--border-strong); stroke-width: 1; }
+  .silo-chip-text {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+
+  /* The attempt: a line that stops short, and value that evaporates on the way. */
+  .silo-line {
+    stroke: var(--border-strong);
+    stroke-width: 1.4;
+    stroke-dasharray: 5 6;
+    opacity: 0.75;
+    fill: none;
+  }
+  .silo-dot {
+    fill: var(--amber-500);
+    opacity: 0;
+    animation: siloDrift 2.6s ease-in infinite;
+  }
+  @keyframes siloDrift {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    18%  { opacity: 1; }
+    72%  { opacity: 0.4; }
+    100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+  }
+
+  /* The void: an empty ring where the shared layer should be. */
+  .silo-core {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1.6;
+    stroke-dasharray: 6 8;
+    opacity: 0.7;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: siloSpin 30s linear infinite;
+  }
+  @keyframes siloSpin { to { transform: rotate(360deg); } }
+  .silo-core-label {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    paint-order: stroke fill;
+    stroke: var(--cst-bg);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+  .silo-core-label-sm { font-size: 11px; letter-spacing: 0.1em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .silo-dot, .silo-core { animation: none; }
+    .silo-dot { opacity: 0.55; }
+  }
+
+  /* ── Company Brain constellation ─────────────────────────────────────── */
+  .brain-section {
+    padding: 96px 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    /* Matches the section background so labels can knock out the lines behind them. */
+    --cst-bg: var(--surface);
+  }
+  .constellation { max-width: 920px; margin: 0 auto; }
+  .constellation svg { width: 100%; height: auto; overflow: visible; }
+  .cst-tall { display: none; }
+  @media (max-width: 700px) {
+    .cst-wide { display: none; }
+    .cst-tall { display: block; max-width: 420px; margin: 0 auto; }
+  }
+
+  .cst-line-base { stroke: var(--border-strong); stroke-width: 1.4; opacity: 0.5; fill: none; }
+  .cst-line-flow {
+    stroke: var(--amber-500);
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-dasharray: 0.1 14;
+    fill: none;
+    animation: cstFlow 1.5s linear infinite;
+  }
+  .cst-line-flow.out { stroke: var(--teal-500); }
+  @keyframes cstFlow { to { stroke-dashoffset: -14; } }
+
+  .cst-tile { fill: #ffffff; stroke: rgba(20,20,30,0.08); stroke-width: 1; }
+  .cst-core { fill: var(--surface); stroke: var(--amber-500); stroke-width: 2.5; }
+  .cst-core-glow {
+    fill: var(--amber-400);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cstPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes cstPulse {
+    0%, 100% { transform: scale(1); opacity: 0.10; }
+    50% { transform: scale(1.18); opacity: 0.20; }
+  }
+  .cst-core-label {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    paint-order: stroke fill;
+    stroke: var(--cst-bg);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+  }
+  .cst-core-label-sm { font-size: 11px; letter-spacing: 0.1em; }
+
+  .cst-agent { fill: var(--surface); stroke: var(--border); stroke-width: 1.2; }
+  .cst-agent-label { fill: var(--text-primary); font-family: var(--font-body); font-size: 15px; font-weight: 600; }
+  .cst-agent-eval { fill: var(--teal-600); font-family: var(--font-mono); font-size: 12px; font-weight: 500; }
+  :global([data-theme="dark"]) .cst-agent-eval { fill: var(--teal-400); }
+  .cst-agent-live { fill: var(--teal-500); animation: cstLive 1.7s ease-in-out infinite; }
+  @keyframes cstLive { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cst-line-flow, .cst-core-glow, .cst-agent-live { animation: none; }
+    .cst-line-flow { stroke-dasharray: none; opacity: 0.55; }
+    .cst-core-glow { opacity: 0.16; }
+  }
+
+  /* ── Integrations carousel ───────────────────────────────────────────── */
+  .integrations-section {
+    padding: 96px 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .carousel-track {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+  .carousel-inner {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: carousel-scroll 40s linear infinite;
+  }
+  @keyframes carousel-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .carousel-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 18px;
+    flex-shrink: 0;
+    opacity: 0.85;
+    margin-right: 96px;
+  }
+  @media (prefers-reduced-motion: reduce) { .carousel-inner { animation: none; } }
 
   /* ── What we do ──────────────────────────────────────────────────────── */
   .services-section {
@@ -579,45 +1080,116 @@ const teamLogos = [
     background: var(--surface);
     border-bottom: 1px solid var(--border);
   }
-  .how-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    max-width: 880px;
-    margin: 0 auto;
+  /* The steps are chevrons that nest into each other. Stacked, the whole step is
+     the chevron with its copy inside, so consecutive steps interlock; in a row,
+     the shape is just the heading band and the copy sits below it.
+     The fills are fixed hex rather than tokens because they are saturated brand
+     colors that read on either theme, which also fixes the text color per step. */
+  .how-chain-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  @media (min-width: 768px) { .how-chain-wrap { padding: 0 40px; } }
+  .how-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }
-  @media (min-width: 768px) { .how-grid { grid-template-columns: repeat(2, 1fr); } }
-  .how-card {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 28px;
+  /* Traces the brand gradient left to right: amber into teal into indigo. */
+  .how-s1 { --chev-bg: #FFD8BF; --chev-fg: #14141E; --chev-dot: #B66535; }
+  .how-s2 { --chev-bg: #7FDBDA; --chev-fg: #14141E; --chev-dot: #14888A; }
+  .how-s3 { --chev-bg: #A5A0F2; --chev-fg: #14141E; --chev-dot: #433DA9; }
+  .how-s4 { --chev-bg: #5049CB; --chev-fg: #FFFFFF; --chev-dot: #5049CB; }
+
+  .how-step {
+    /* Scales with width so the V stays proportional from phone to tablet. */
+    --notch: clamp(28px, 5.5vw, 60px);
+    background: var(--chev-bg);
+    color: var(--chev-fg);
+    padding: calc(var(--notch) + 20px) 26px;
+    clip-path: polygon(
+      0 0,
+      50% var(--notch),
+      100% 0,
+      100% calc(100% - var(--notch)),
+      50% 100%,
+      0 calc(100% - var(--notch))
+    );
+  }
+  /* Pull each step up by the notch so the one above points into it. */
+  .how-step + .how-step { margin-top: calc(var(--notch) * -1); }
+
+  .how-chev h3 {
+    font-size: 1.05rem;
+    margin: 0;
+    color: inherit;
   }
   .how-num {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    opacity: 0.7;
+    color: inherit;
   }
-  .how-card:nth-child(1) .how-num { color: var(--amber-500); }
-  .how-card:nth-child(2) .how-num { color: var(--teal-500); }
-  .how-card:nth-child(3) .how-num { color: var(--indigo-500); }
-  .how-card:nth-child(4) .how-num {
-    background: var(--gradient-brand);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    width: fit-content;
-  }
-  .how-card h3 {
-    font-size: 1.15rem;
-    margin-bottom: 8px;
-  }
-  .how-card p {
+  .how-note { padding-top: 12px; }
+  .how-note p {
     font-size: 0.925rem;
-    color: var(--text-secondary);
     line-height: 1.65;
+    color: inherit;
+    opacity: 0.82;
+  }
+
+  /* Accumulating blocks: one more per step, so the last step carries all four. */
+  .how-stack { display: flex; gap: 5px; padding-top: 14px; }
+  .how-stack span {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    background: currentColor;
+    opacity: 0.75;
+  }
+
+  @media (min-width: 1120px) {
+    /* Two grid rows: chevrons on top all share the tallest one's height, notes
+       beneath line up with the chevron above them. display:contents drops the
+       step's own box, handing the shape back to .how-chev. */
+    .how-chain {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      grid-template-rows: auto auto;
+      align-items: stretch;
+    }
+    .how-step { display: contents; --notch: 22px; }
+    .how-chev {
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--chev-bg);
+      color: var(--chev-fg);
+      /* Overhang the next column so this point fills that chevron's notch. */
+      margin-right: calc(var(--notch) * -1);
+      padding: 20px calc(var(--notch) + 14px) 20px calc(var(--notch) + 16px);
+      clip-path: polygon(
+        0 0,
+        calc(100% - var(--notch)) 0,
+        100% 50%,
+        calc(100% - var(--notch)) 100%,
+        0 100%,
+        var(--notch) 50%
+      );
+    }
+    .how-s4 .how-chev { margin-right: 0; }
+    .how-note {
+      grid-row: 2;
+      padding: 20px calc(var(--notch) + 14px) 0 calc(var(--notch) + 16px);
+    }
+    .how-note p { color: var(--text-secondary); opacity: 1; }
+    .how-stack span { background: var(--chev-dot); opacity: 1; }
+    .how-s4 .how-stack span:nth-child(1) { background: #B66535; }
+    .how-s4 .how-stack span:nth-child(2) { background: #14888A; }
+    .how-s4 .how-stack span:nth-child(3) { background: #433DA9; }
+    .how-s4 .how-stack span:nth-child(4) { background: #5049CB; }
   }
 
   /* ── Why Mateos ──────────────────────────────────────────────────────── */
@@ -941,8 +1513,11 @@ const teamLogos = [
     /* Section padding */
     .hero { min-height: 100svh; }
     .thesis-section { padding: 60px 0; }
+    .brain-section { padding: 52px 0; }
     .services-section { padding: 52px 0; }
     .how-section { padding: 52px 0; }
+    .integrations-section { padding: 52px 0; }
+    .carousel-logo { width: 76px; height: 76px; margin-right: 56px; }
     .why-section { padding: 52px 0; }
     .why-featured { padding: 36px 20px; }
     .coming-soon-section { padding: 52px 0; }
@@ -965,12 +1540,19 @@ const teamLogos = [
 
   /* ── Dark mode section backgrounds: alternate light / dark for contrast ──
      "light" = a lighter charcoal (#1C1C2B); "dark" = near-black (--neutral-900).
-     Sequence down the page: hero(dark) · thesis(light) · services(dark) ·
-     how(light) · why(dark) · cta(light). */
+     Sequence down the page: hero(dark) · thesis+brain(light) · services(dark) ·
+     how+integrations(light) · why(dark) · cta(light). */
   :global([data-theme="dark"]) .thesis-section,
+  :global([data-theme="dark"]) .brain-section,
   :global([data-theme="dark"]) .how-section,
+  :global([data-theme="dark"]) .integrations-section,
   :global([data-theme="dark"]) .cta-section {
     background: #1C1C2B;
+  }
+  :global([data-theme="dark"]) .brain-section { --cst-bg: #1C1C2B; }
+  :global([data-theme="dark"]) .thesis-section {
+    --cst-bg: #1C1C2B;
+    --silo-fill: var(--surface);
   }
   :global([data-theme="dark"]) .services-section,
   :global([data-theme="dark"]) .why-section {
